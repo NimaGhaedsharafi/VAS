@@ -33,9 +33,11 @@ package edu.usfca.vas.machine.fa;
 
 import edu.usfca.xj.foundation.XJXMLSerializable;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -376,19 +378,19 @@ public class FAMachine implements XJXMLSerializable {
 		FAState s1, s2;
 		String alpha = this.getAlphabet().getSymbolsString();
 		FAStates states = this.getStates();
-		
-		int count = 0;
+		FAStates removedStates = new FAStates();		
 		
 		for(int i = 0; i < size - 1; i++)
 		{
+			// set s1 to current State with index of i
+    		s1 = (FAState) states.getStates().get(i);
+    		
 			for(int j = 0; j < size - 1 - i; j++)
 			{
 				if(table[i][j].equals("1"))
 				{
-					// set s1 to current State with index of i
-		    		s1 = (FAState) states.getStates().get(i - count);
 		    		// set s2 to current State with index of size - 1 - j
-		    		s2 = (FAState) states.getStates().get(size - 1 - j - count);
+		    		s2 = (FAState) states.getStates().get(size - 1 - j);
 		    		
 		    		String name = s1.name + "=" + s2.name;
 		    		this.getTransitions().renameState(s2.name, name);
@@ -400,22 +402,48 @@ public class FAMachine implements XJXMLSerializable {
 		    			{
 		    				this.getTransitions().addTransition(s2.name, String.format("%c", alpha.charAt(k)), s2.name);
 		    			}
-		    			this.getTransitions().removeTransition(s1.name, String.format("%c", alpha.charAt(k)));
 		    			this.getTransitions().removeTransition(s2.name, String.format("%c", alpha.charAt(k)), s1.name);
+		    			this.getTransitions().removeTransition(s1.name, String.format("%c", alpha.charAt(k)));
 		    		}
+		    		this.getTransitions().renameState(s1.name, name);
 		    		if(s1.start)
 		    		{
 		    			s2.start = true;
 		    		}
-		    		
-		    		this.getStates().removeState(s1);
-		    		count++;
+		    	
+		    		removedStates.addState(s1);
 				}
 			}
 		}
+		for(int i = 0; i < removedStates.getStates().size(); i++)
+		{
+			s1 = (FAState) removedStates.getStates().get(i);
+			s1 = states.containsObj(s1.name);
+			states.removeState(s1);
+		}
+		for(int i = 0; i < this.getTransitions().transitions.size(); i++)
+		{
+			FATransition tr = (FATransition) this.getTransitions().transitions.get(i);
+			s1 = states.containsObj(tr.s1);
+			tr.s1 = deDup(tr.s1);
+			if(s1 != null)
+			{
+				s1.name = tr.s1;
+			}
+			
+			s1 = states.containsObj(tr.s2);
+			tr.s2 = deDup(tr.s2);
+			if(s1 != null)
+			{
+				s1.name = tr.s2;
+			}
+		}
+			
 		return;
 	}
-
+	public String deDup(String s) {
+	    return new LinkedHashSet<String>(Arrays.asList(s.split("="))).toString().replaceAll("(^\\[|\\]$)", "").replace(", ", "=");
+	}
 	private void findRemainig(String[][] table)
 	{
 		int size = states.getStates().size();
