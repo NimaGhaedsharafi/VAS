@@ -3,7 +3,9 @@
 A tool for simulating, visualizing and transforming finite state automata and Turing Machines
 
 (c) 2004-2006 Jean Bovet
-	
+
+http://www.cs.usfca.edu/~jbovet/vas.html
+
 Abstract
 
     This small application allows to create and simulate any Deterministic or Non-Deterministic Finite Automata (DFA or NFA) as well as Turing Machines (TM).
