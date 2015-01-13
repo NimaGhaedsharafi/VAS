@@ -28,6 +28,6 @@ Features
 
 	
 	
-#at 2013 , I developed this cool java application and added DFA Minimizer Feature.#
-#Nima Ghaedsharafi#
+##at 2013 , I developed this cool java application and added DFA Minimizer Feature.##
+###Nima Ghaedsharafi###
 http://nifi.ir
